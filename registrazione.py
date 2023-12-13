@@ -1,10 +1,7 @@
-import redis
+from connessione import connessione
 
-redis_host = "redis-11457.c3.eu-west-1-2.ec2.cloud.redislabs.com"
-redis_port = 11457
-redis_password = "Password"
 
-redis_client = redis.StrictRedis(host=redis_host, port=redis_port, password=redis_password, decode_responses=True)
+redis_client = connessione()
 
 def controllare_disponibilita_nome_utente(nome_utente):
     return not redis_client.hexists("utenti", nome_utente)
