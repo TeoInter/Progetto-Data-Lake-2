@@ -8,3 +8,4 @@ def connessione():
 
     # Connettiti al server Redis
     redis_client = redis.StrictRedis(host=redis_host, port=redis_port, password=redis_password, decode_responses=True)
+    return redis_client
