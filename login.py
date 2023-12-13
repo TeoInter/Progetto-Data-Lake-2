@@ -1,23 +1,20 @@
-import redis
+from connessione import connessione
+redis_client = connessione()
 
-redis_host = "redis-11457.c3.eu-west-1-2.ec2.cloud.redislabs.com"
-redis_port = 11457
-redis_password = "Password"
-
-# Connettiti al server Redis
-redis_client = redis.StrictRedis(host=redis_host, port=redis_port, password=redis_password, decode_responses=True)
-
+def ottenere_password(nome_utente):
+    if not redis_client.hexists("utenti", nome_utente):
+        return "Utente non trovato."
+    password = redis_client.hget("utenti", nome_utente)
+    return password
 
 def login():
-    username = input("Inserisci il nome utente: ")
-    password = getpass.getpass("Inserisci la password: ")
-
-    # Verifica le credenziali
-    password_memorizzata = redis_client.hget("utenti", username)
-    if password == password_memorizzata:
-        print("Accesso effettuato con successo!")
+    nome_utente = input("Inserisci il nome utente: ")
+    password_giusta = ottenere_password(nome_utente)
+    password_digitata = input("Inserisci password: ")
+    if password_digitata == password_giusta:
+        print(f"Accesso, ciao {nome_utente}")
     else:
-        print("Nome utente o password non validi.")
+        print("Password e/o username non validi")
 
-
-login()
+if __name__ == '__main__':
+    login()
