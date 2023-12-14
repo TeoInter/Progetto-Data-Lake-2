@@ -9,36 +9,49 @@ redis_password = "Password"
 # Connettiti al server Redis
 redis_client = redis.StrictRedis(host=redis_host, port=redis_port, password=redis_password, decode_responses=True)
 
-print("\nScegli l'opzione desiderata: ")
-print("1. Registrazione")
-print("2. Login")
-print("3. Cambia stato disturb/no disturb")
-print("4. Esci")
+def registrazione():
+    print("Hai scelto l'opzione di registrazione.")
+    # Implementa la logica di registrazione qui
 
-scelta = input("Inserisci il numero dell'opzione: ")
-print(f"Hai scelto l'opzione {scelta}")
+def login():
+    print("Hai scelto l'opzione di login.")
+    # Implementa la logica di login qui
 
-if scelta == '1':
-    subprocess.call(["python", "registrazione.py"])
-elif scelta == '2':
-    subprocess.call(["python", "login.py"])
-elif scelta == '3':
-    username = input("Inserisci il nome utente: ")
+def cambia_stato(username):
+    # Verifica se l'utente esiste nel database
+    if redis_client.hexists("stato", username):
+        # Ottieni il valore corrente
+        stato_attuale = redis_client.hget("stato", username)
 
-    # Utilizza hget per ottenere il valore corrente dello stato disturb/no disturb
-    stato_attuale = redis_client.hget(username, 'Field')
-    print(f"Stato attuale per {username}: {stato_attuale}")
-    print(f"Hash per {username} prima del cambiamento: {redis_client.hgetall(username)}")
+        # Inverti il valore corrente
+        nuovo_stato = '1' if stato_attuale == '0' else '0'
 
-    if stato_attuale is not None:
-        nuovo_stato = '1' if stato_attuale == '0' else '0'  # Inverti il valore
-        redis_client.hset(username, 'Field', nuovo_stato)  # Imposta il nuovo stato
-        print(f"Stato disturb/no disturb cambiato a: {nuovo_stato}")
-        print(f"Hash per {username} dopo il cambiamento: {redis_client.hgetall(username)}")
+        # Imposta il nuovo valore nel campo 'Field'
+        redis_client.hset("stato", username, nuovo_stato)
+
+        print(f"Stato disturb/no disturb per {username} cambiato a: {nuovo_stato}")
     else:
-        print(f"Utente {username} non trovato nel database.")
-elif scelta == '4':
-    print("Hai scelto di uscire.")
-else:
-    print("Opzione non valida. Per favore, scegli un'opzione valida.")
+        print(f"L'utente {username} non esiste nel database.")
 
+# Menu principale
+while True:
+    print("\nScegli un'opzione:")
+    print("1. Registrazione")
+    print("2. Login")
+    print("3. Cambia stato disturb/no disturb")
+    print("4. Esci")
+
+    scelta = input("Inserisci il numero dell'opzione: ")
+
+    if scelta == '1':
+        registrazione()
+    elif scelta == '2':
+        login()
+    elif scelta == '3':
+        username = input("Inserisci il nome utente: ")
+        cambia_stato(username)
+    elif scelta == '4':
+        print("Hai scelto di uscire.")
+        break
+    else:
+        print("Opzione non valida. Per favore, scegli un'opzione valida.")
