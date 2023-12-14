@@ -13,7 +13,7 @@ if scelta == '1':
 elif scelta == '2':
     nome_utente = Funzioni.login()
     if nome_utente is not None:
-        print("Accesso eseguito, cosa vuoi fare?\n1)Attiva/disattiva Dnd\n2)Visualizza Lista Amici\n3)Ricerca Utente")
+        print("Accesso eseguito, cosa vuoi fare?\n1)Attiva/disattiva Dnd\n2)Visualizza Lista Amici\n3)Ricerca Utente\n4)Scrivi Messaggio")
         selezione = input("Fai la tua scelta: ")
         if int(selezione) == 1:
             Funzioni.visualizza_stato(nome_utente)
@@ -25,6 +25,10 @@ elif scelta == '2':
             print(f"Desideri aggiungere {utente_cercato} agli amici (y/n)? ")
             if input() == 'y':
                 Funzioni.aggiungere_amico(nome_utente=nome_utente, nome_amico=utente_cercato)
+        if int(selezione) == 4:
+            lista_amici = list(Funzioni.ottenere_lista_amici(nome_utente))
+            destinatario = Funzioni.scegli_amico_da_lista(lista_amici)
+            Funzioni.invia_messaggio(mittente=nome_utente,destinatario=destinatario)
         else:
             print("Errore, selezione non valida")
 elif scelta == '3':

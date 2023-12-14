@@ -57,8 +57,22 @@ def aggiungere_amico(nome_utente, nome_amico):
 def cercare_utenti():
     nome_cercato = input("Chi vuoi cercare?")
     tutti_utenti = redis_client.hkeys("utenti")
-    utente_risultato = [utente for utente in tutti_utenti if nome_cercato.lower() in utente.lower()]
-    return utente_risultato
+    risultato_ricerca = [utente for utente in tutti_utenti if nome_cercato.lower() in utente.lower()]
+    if not risultato_ricerca:
+        print("Nessun risultato trovato.")
+        return None
+    elif len(risultato_ricerca) == 1:
+        return risultato_ricerca[0]
+    else:
+        print("Sono stati trovati più risultati:")
+        for i, utente in enumerate(risultato_ricerca, 1):
+            print(f"{i}. {utente}")
+        while True:
+            scelta = input("Inserisci il numero dell'utente desiderato: ")
+            if scelta.isdigit() and 1 <= int(scelta) <= len(risultato_ricerca):
+                return risultato_ricerca[int(scelta) - 1]
+            else:
+                print("Scelta non valida. Riprova.")
 
 def cambia_stato(nome_utente,valore):
     if int(valore) == 0:
@@ -80,5 +94,36 @@ def visualizza_stato(nome_utente):
     else:
         print(f"Il campo {nome_utente} non esiste nel database.")
 
-redis_client = connessione()
+def visualizza_cronologia(mittente, destinatario):
+    chiave_cronologia_mittente = f"cronologia:{mittente}:{destinatario}"
+    cronologia_mittente = redis_client.lrange(chiave_cronologia_mittente, 0, -1)
+    for messaggio in cronologia_mittente:
+        print(messaggio)
 
+def scegli_amico_da_lista(lista_amici):
+    while True:
+        print("Lista degli amici:")
+        for i, amico in enumerate(lista_amici, 1):
+            print(f"{i}. {amico}")
+        scelta = input("Scegli un amico (inserisci il numero corrispondente): ")
+        try:
+            indice_scelto = int(scelta)
+            if 1 <= indice_scelto <= len(lista_amici):
+                amico_scelto = lista_amici[indice_scelto - 1]
+                return amico_scelto
+            else:
+                print("Inserisci un numero valido.")
+        except ValueError:
+            print("Inserisci un numero valido.")
+
+def invia_messaggio(mittente, destinatario):
+    visualizza_cronologia(mittente, destinatario)
+    testo = input("Digita il tuo messaggio: ")
+    chiave_cronologia_mittente = f"cronologia:{mittente}:{destinatario}"
+    chiave_cronologia_destinatario = f"cronologia:{destinatario}:{mittente}"
+    messaggio = f">{testo}"
+    redis_client.rpush(chiave_cronologia_mittente, messaggio)
+    messaggio = f"<{testo}"
+    redis_client.rpush(chiave_cronologia_destinatario, messaggio)
+
+redis_client = connessione()
