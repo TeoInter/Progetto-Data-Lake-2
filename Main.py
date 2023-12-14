@@ -45,18 +45,18 @@ def invia_messaggio(destinatario, mittente, messaggio):
         if stato_destinatario == '1':
             print(f"Errore: Impossibile inviare il messaggio a {destinatario}. Il destinatario è in modalità 'Do Not Disturb'.")
         else:
-            # Aggiungi il messaggio alla coda del destinatario
-            coda_destinatario = f"coda:{destinatario}"
+            # Aggiungi il messaggio alla crono del destinatario
+            cronologia_destinatario = f"cronologia:{destinatario}"
             messaggio_da_inviare = f"{mittente}: {messaggio}"
-            redis_client.rpush(coda_destinatario, messaggio_da_inviare)
+            redis_client.rpush(cronologia_destinatario, messaggio_da_inviare)
             print(f"Messaggio inviato a {destinatario}: {messaggio}")
     else:
         print(f"Errore: {destinatario} non è nella lista amici di {mittente}.")
 
 def leggi_messaggi(username):
-    # Recupera i messaggi dalla coda dell'utente
-    coda_utente = f"coda:{username}"
-    messaggi = redis_client.lrange(coda_utente, 0, -1)
+    # Recupera i messaggi dalla cronologia dell'utente
+    cronologia_utente = f"cronologia:{username}"
+    messaggi = redis_client.lrange(cronologia_utente, 0, -1)
 
     if messaggi:
         print(f"\nMessaggi per {username}:")
