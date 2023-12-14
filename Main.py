@@ -41,3 +41,4 @@ elif scelta == '4':
     print("Hai scelto di uscire.")
 else:
     print("Opzione non valida. Per favore, scegli un'opzione valida.")
+
