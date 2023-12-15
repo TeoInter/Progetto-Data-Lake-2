@@ -1,4 +1,2 @@
-Librerie utilizzate e versioni
-
-- Redis v 4.3.4, utilizzata per interagire con un server Redis da un'applicazione Python
+Redis == 4.3.4
 
