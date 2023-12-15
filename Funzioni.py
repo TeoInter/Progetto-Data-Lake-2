@@ -50,18 +50,19 @@ def aggiungere_amico(nome_utente, nome_amico):
         return "Utente o amico non trovato."
     if redis_client.sadd(f"amici:{nome_utente}", nome_amico):
         redis_client.sadd(f"amici:{nome_amico}", nome_utente)
-        return f"{nome_amico} aggiunto alla lista degli amici di {nome_utente} (amicizia reciproca)."
+        print(f"{nome_amico} aggiunto alla lista dei tuoi amici.")
     else:
-        return f"{nome_amico} è già presente nella lista degli amici di {nome_utente}."
+        print(f"{nome_amico} è già tuo amico.")
 
 def cercare_utenti():
-    nome_cercato = input("Chi vuoi cercare?")
+    nome_cercato = input("Chi vuoi cercare? ")
     tutti_utenti = redis_client.hkeys("utenti")
     risultato_ricerca = [utente for utente in tutti_utenti if nome_cercato.lower() in utente.lower()]
     if not risultato_ricerca:
         print("Nessun risultato trovato.")
         return None
     elif len(risultato_ricerca) == 1:
+        print(f"È stato trovato un solo utente: {risultato_ricerca}")
         return risultato_ricerca[0]
     else:
         print("Sono stati trovati più risultati:")
@@ -84,7 +85,11 @@ def cambia_stato(nome_utente,valore):
     nuovo_valore = redis_client.hget("stato", nome_utente)
     print(f"Nuovo valore per {nome_utente}: {nuovo_valore}")
 
-def visualizza_stato(nome_utente):
+def visualizza_stato(utente):
+    valore = redis_client.hget("stato", utente)
+    return valore
+
+def stato(nome_utente):
     valore = redis_client.hget("stato", nome_utente)
     if valore is not None:
         print(f"Lo stato di {nome_utente} è: {valore}")
@@ -119,11 +124,15 @@ def scegli_amico_da_lista(lista_amici):
 def invia_messaggio(mittente, destinatario):
     visualizza_cronologia(mittente, destinatario)
     testo = input("Digita il tuo messaggio: ")
-    chiave_cronologia_mittente = f"cronologia:{mittente}:{destinatario}"
-    chiave_cronologia_destinatario = f"cronologia:{destinatario}:{mittente}"
-    messaggio = f">{testo}"
-    redis_client.rpush(chiave_cronologia_mittente, messaggio)
-    messaggio = f"<{testo}"
-    redis_client.rpush(chiave_cronologia_destinatario, messaggio)
-
+    stato_destinatario = visualizza_stato(destinatario)
+    if int(stato_destinatario)== 0:
+        chiave_cronologia_mittente = f"cronologia:{mittente}:{destinatario}"
+        chiave_cronologia_destinatario = f"cronologia:{destinatario}:{mittente}"
+        messaggio = f">{testo}"
+        redis_client.rpush(chiave_cronologia_mittente, messaggio)
+        messaggio = f"<{testo}"
+        redis_client.rpush(chiave_cronologia_destinatario, messaggio)
+        print("Messaggio inviato correttamente")
+    else:
+        print(f"L'utente {destinatario} è in modalità non disturbare, riprova più tardi")
 redis_client = connessione()
