@@ -1,4 +1,5 @@
 import redis
+import datetime
 
 def connessione():
     redis_host = "redis-11457.c3.eu-west-1-2.ec2.cloud.redislabs.com"
@@ -100,7 +101,7 @@ def stato(nome_utente):
         print(f"Il campo {nome_utente} non esiste nel database.")
 
 def visualizza_cronologia(mittente, destinatario):
-    chiave_cronologia_mittente = f"cronologia:{mittente}:{destinatario}"
+    chiave_cronologia_mittente = f"chat:{mittente}:{destinatario}"
     cronologia_mittente = redis_client.lrange(chiave_cronologia_mittente, 0, -1)
     for messaggio in cronologia_mittente:
         print(messaggio)
@@ -126,11 +127,12 @@ def invia_messaggio(mittente, destinatario):
     testo = input("Digita il tuo messaggio: ")
     stato_destinatario = visualizza_stato(destinatario)
     if int(stato_destinatario)== 0:
-        chiave_cronologia_mittente = f"cronologia:{mittente}:{destinatario}"
-        chiave_cronologia_destinatario = f"cronologia:{destinatario}:{mittente}"
-        messaggio = f">{testo}"
+        data_ora_invio = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        messaggio = f"> {testo} [{data_ora_invio}]"
+        chiave_cronologia_mittente = f"chat:{mittente}:{destinatario}"
         redis_client.rpush(chiave_cronologia_mittente, messaggio)
-        messaggio = f"<{testo}"
+        messaggio = f"< {testo} [{data_ora_invio}]"
+        chiave_cronologia_destinatario = f"chat:{destinatario}:{mittente}"
         redis_client.rpush(chiave_cronologia_destinatario, messaggio)
         print("Messaggio inviato correttamente")
     else:
