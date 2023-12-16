@@ -78,22 +78,27 @@ def cercare_utenti():
 
 def cambia_stato(nome_utente,valore):
     if int(valore) == 0:
-        print("Ci sono")
         valore = 1
     else:
         valore = 0
     redis_client.hset("stato", nome_utente, valore)
     nuovo_valore = redis_client.hget("stato", nome_utente)
-    print(f"Nuovo valore per {nome_utente}: {nuovo_valore}")
+    print(f"{visualizza_stato(nuovo_valore)}ta")
 
-def visualizza_stato(utente):
+def ottieni_stato(utente):
     valore = redis_client.hget("stato", utente)
     return valore
+
+def visualizza_stato(valore):
+    if int(valore)== 1:
+        return 'Modalità DnD attiva'
+    else:
+        return 'Modalita Dnd disattiva'
 
 def stato(nome_utente):
     valore = redis_client.hget("stato", nome_utente)
     if valore is not None:
-        print(f"Lo stato di {nome_utente} è: {valore}")
+        print(visualizza_stato(valore))
         stato = input("Cambiare stato? (y/n)")
         if stato.lower() == 'y':
             cambia_stato(nome_utente,valore)
@@ -125,7 +130,7 @@ def scegli_amico_da_lista(lista_amici):
 def invia_messaggio(mittente, destinatario):
     visualizza_cronologia(mittente, destinatario)
     testo = input("Digita il tuo messaggio: ")
-    stato_destinatario = visualizza_stato(destinatario)
+    stato_destinatario = ottieni_stato(destinatario)
     if int(stato_destinatario)== 0:
         data_ora_invio = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         messaggio = f"> {testo} [{data_ora_invio}]"
