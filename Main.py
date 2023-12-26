@@ -10,7 +10,8 @@ while True:
     print(f"Hai scelto l'opzione {scelta}")
 
     if scelta == '1':
-        Funzioni.registrare_utente()
+        stato = Funzioni.registrare_utente()
+        print(stato)
     elif scelta == '2':
         nome_utente = Funzioni.login()
         while True:
@@ -21,7 +22,10 @@ while True:
                     Funzioni.stato(nome_utente)
                 elif int(selezione) == 2:
                     lista_amici = Funzioni.ottenere_lista_amici(nome_utente)
-                    print(lista_amici)
+                    if lista_amici:
+                        print(lista_amici)
+                    else:
+                        print("Lista amici vuota")
                 elif int(selezione) == 3:
                     utente_cercato = Funzioni.cercare_utenti()
                     print(f"Desideri aggiungere {utente_cercato} agli amici (y/n)? ")

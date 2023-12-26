@@ -142,4 +142,5 @@ def invia_messaggio(mittente, destinatario):
         print("Messaggio inviato correttamente")
     else:
         print(f"L'utente {destinatario} è in modalità non disturbare, riprova più tardi")
+
 redis_client = connessione()
