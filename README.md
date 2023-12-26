@@ -1,5 +1,6 @@
 # Progetto-Data-Lake-2
 Chat
+
 Descrizone progetto: lo scopo era quello di creare un software di messaggistica stile Whatsapp. Le funzionalità principali erano: 1.registrazione utente sul sistema indicando nome utente e password, 2. aggiunta di un utente alla propria lista contatti, 3. invio di messaggi ad altri utenti presenti nella propria lista contatti, 4. lettura dei messaggi presenti in una chat con un utente specifico.
 
 Requisiti: python 3.11
